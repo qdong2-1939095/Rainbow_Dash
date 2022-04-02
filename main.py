@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt  # Module used for plotting
 from muselsl import list_muses, stream
 from pylsl import StreamInlet, resolve_byprop  # Module to receive EEG data
 from scipy.signal import lfilter_zi, lfilter, butter
+from Rainbow_Dash.canvas import draw_line
+
+import data_parser as dp
+import canvas as cv
 
 NOTCH_B, NOTCH_A = butter(4, np.array([55, 65])/(256/2), btype='bandstop')
 
@@ -114,6 +118,7 @@ if __name__ == '__main__':
     filter_state = None  # for use with the notch filter
 
     try:
+        cv.load_canvas()
         # The following loop does what we see in the diagram of Exercise 1:
         # acquire data, compute features, visualize raw EEG and the features
         while True:
@@ -130,8 +135,13 @@ if __name__ == '__main__':
             ch_data = np.array(eeg_data)[:, index_channel]
             ch_data_gyro = np.array(gyro_data)
 
-            print(ch_data)
-            print(ch_data_gyro)
+            # print(ch_data)
+            # print(ch_data_gyro)
+            gyros, colors = dp.data_stream(ch_data_gyro, ch_data)
+            for idx in range(len(gyros)):
+                cur_offset = gyros[idx]
+                cur_color = colors[idx]
+                cv.draw_line(cur_offset[0], cur_offset[1], cur_color[0], cur_color[1], cur_color[2])
 
             # # Update EEG buffer
             # eeg_buffer, filter_state = update_buffer(
@@ -142,6 +152,7 @@ if __name__ == '__main__':
             # plotter_eeg.update_plot(eeg_buffer)
             # plotter_feat.update_plot(feat_buffer)
             # plt.pause(0.00001)
+
 
     except KeyboardInterrupt:
 

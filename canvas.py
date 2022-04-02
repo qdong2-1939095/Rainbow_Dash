@@ -1,10 +1,13 @@
 from tkinter import *
-app = Tk()
-app.geometry("1080x720")
-canvas = Canvas(app, width=1080, height=720, bg='white')
-canvas.pack(pady=20)
-# canvas = Canvas(app, bg='red')
-# canvas.pack(anchor='nw', fill='both', expand=1)
+
+canvas = Canvas()
+def load_canvas():
+    app = Tk()
+    app.geometry("1080x720")
+    canvas = Canvas(app, width=1080, height=720, bg='white')
+    canvas.pack(pady=20)
+    # canvas = Canvas(app, bg='red')
+    # canvas.pack(anchor='nw', fill='both', expand=1)
 
 def get_x_and_y(event):
     global lasx, lasy
@@ -22,6 +25,7 @@ def draw_smth(event):
                       width=2)
     lasx, lasy = event.x, event.y
 
-canvas.bind("<Button-1>", get_x_and_y)
-canvas.bind("<B1-Motion>", draw_smth)
-app.mainloop()
+def draw_line(x_offset, y_offset, r, g, b):
+    canvas.bind("<Button-1>", get_x_and_y)
+    canvas.bind("<B1-Motion>", draw_smth)
+# app.mainloop()
