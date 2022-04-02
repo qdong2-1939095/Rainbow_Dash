@@ -1,7 +1,9 @@
 from tkinter import *
 
-canvas = Canvas()
+canvas = None
+
 def load_canvas():
+    global canvas
     app = Tk()
     app.geometry("1080x720")
     canvas = Canvas(app, width=1080, height=720, bg='white')

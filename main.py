@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt  # Module used for plotting
 from muselsl import list_muses, stream
 from pylsl import StreamInlet, resolve_byprop  # Module to receive EEG data
 from scipy.signal import lfilter_zi, lfilter, butter
-from Rainbow_Dash.canvas import draw_line
 
 import data_parser as dp
 import canvas as cv
@@ -118,9 +117,9 @@ if __name__ == '__main__':
     filter_state = None  # for use with the notch filter
 
     try:
-        cv.load_canvas()
         # The following loop does what we see in the diagram of Exercise 1:
         # acquire data, compute features, visualize raw EEG and the features
+        cv.load_canvas()
         while True:
             """ 3.1 ACQUIRE DATA """
             # Obtain EEG data from the LSL stream
