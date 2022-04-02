@@ -38,9 +38,10 @@ def process_gyro(input):
         smoothed_z = sum_z / AVG_WINDOW
         GYRO_Y.get()        # remove the first element from the queues
         GYRO_Z.get()
-    if smoothed_y >= GYRO_LO_THRES and smoothed_y <= GYRO_HI_THRES: smoothed_y = 0
-    if smoothed_z >= GYRO_LO_THRES and smoothed_z <= GYRO_HI_THRES: smoothed_z = 0
-    return smoothed_y * DELTA_T, smoothed_z * DELTA_T
+        if smoothed_y >= GYRO_LO_THRES and smoothed_y <= GYRO_HI_THRES: smoothed_y = 0
+        if smoothed_z >= GYRO_LO_THRES and smoothed_z <= GYRO_HI_THRES: smoothed_z = 0
+        return smoothed_y * DELTA_T, smoothed_z * DELTA_T
+    else: return 0, 0
 
 
 def extract_channels(input):
@@ -53,7 +54,7 @@ def channel_to_color(channel):
     """
     Given a channel and its value, map to a number between 0 to 255 and return it
     """
-    return min(255, abs(channel))
+    return int(min(255, abs(channel)))
 
 def process_color(input):
     """
