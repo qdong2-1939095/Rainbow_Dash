@@ -122,12 +122,14 @@ if __name__ == '__main__':
     filter_state = None  # for use with the notch filter
 
     # create a tkinter window and built same-size canvas in it
+    CANVAS_WIDTH = 1080
+    CANVAS_HEIGHT = 720
     app = Tk()
-    app.geometry("1080x720")
-    canvas = Canvas(app, width=1080, height=720, bg='white')
+    app.geometry(str(CANVAS_WIDTH) + "x" + str(CANVAS_HEIGHT))
+    canvas = Canvas(app, width=CANVAS_WIDTH, height=CANVAS_HEIGHT, bg='white')
     canvas.pack(pady=20)
-    lasx = 540
-    lasy = 360
+    lasx = CANVAS_WIDTH / 2
+    lasy = CANVAS_HEIGHT / 2
 
     try:
         # The following loop does what we see in the diagram of Exercise 1:
@@ -143,6 +145,7 @@ if __name__ == '__main__':
                 timeout=1, max_samples=int(shift_length * fs))
 
             # Only keep the channel we're interested in
+            print(np.shape(eeg_data))
             ch_data = np.array(eeg_data)[:, index_channel]
             ch_data_gyro = np.array(gyro_data)
 
@@ -152,13 +155,17 @@ if __name__ == '__main__':
             for idx in range(len(gyros)):
                 cur_offset = gyros[idx]
                 cur_color = colors[idx]
-                canvas.create_line((lasx, lasy, cur_offset[0], cur_offset[1]),
+                # scalar_x, scalar_y = get_correcting_scalar(lasx, lasy)
+                new_x = max(0, min(lasx + cur_offset[1], CANVAS_WIDTH))
+                new_y = max(0, min(lasy + cur_offset[0], CANVAS_HEIGHT))
+                canvas.create_line((lasx, lasy, new_x, new_y),
                       fill=_from_rgb((cur_color[0], cur_color[1], cur_color[2])),
-                      width=2)
+                      width=7)
+                print(lasx, lasy, cur_offset[0], cur_offset[1])
                 app.update_idletasks()
                 app.update()
-                lasx += cur_offset[0]
-                lasy += cur_offset[1]
+                lasx = new_x
+                lasy = new_y
 
             # # Update EEG buffer
             # eeg_buffer, filter_state = update_buffer(

@@ -4,7 +4,7 @@ from queue import Queue
 AVG_WINDOW = 9       # averaging/smoothing value among the neighboring X datapoints
 GYRO_HI_THRES = 8   # smoothed speed is set to 0 if below this value
 GYRO_LO_THRES = -8  # AND above this value
-DELTA_T = 1
+DELTA_T = 0.12
 
 GYRO_Y = Queue(maxsize=AVG_WINDOW+1)
 GYRO_Z = Queue(maxsize=AVG_WINDOW+1)
@@ -36,11 +36,15 @@ def process_gyro(input):
             GYRO_Z.put(cur_z)
         smoothed_y = sum_y / AVG_WINDOW
         smoothed_z = sum_z / AVG_WINDOW
+        if smoothed_y > 0:
+            smoothed_y *= 0.5
+        if smoothed_z > 0:
+            smoothed_z *= 0.85
         GYRO_Y.get()        # remove the first element from the queues
         GYRO_Z.get()
         if smoothed_y >= GYRO_LO_THRES and smoothed_y <= GYRO_HI_THRES: smoothed_y = 0
         if smoothed_z >= GYRO_LO_THRES and smoothed_z <= GYRO_HI_THRES: smoothed_z = 0
-        return smoothed_y * DELTA_T, smoothed_z * DELTA_T
+        return smoothed_y * DELTA_T, -1 * smoothed_z * DELTA_T
     else: return 0, 0
 
 
@@ -54,7 +58,7 @@ def channel_to_color(channel):
     """
     Given a channel and its value, map to a number between 0 to 255 and return it
     """
-    return int(min(255, abs(channel)))
+    return int(min(255, 0.5 * abs(channel)))
 
 def process_color(input):
     """
