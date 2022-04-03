@@ -155,7 +155,13 @@ if __name__ == '__main__':
             for idx in range(len(gyros)):
                 cur_offset = gyros[idx]
                 cur_color = colors[idx]
-                # scalar_x, scalar_y = get_correcting_scalar(lasx, lasy)
+                scalar_x, scalar_y = dp.get_correcting_scalar(CANVAS_WIDTH, CANVAS_HEIGHT, lasx, lasy)
+                if lasx > 0.5 * CANVAS_WIDTH and cur_offset[1] < 0 \
+                or lasx < 0.5 * CANVAS_WIDTH and cur_offset[1] > 0:
+                    cur_offset[1] *= scalar_x
+                if lasy > 0.5 * CANVAS_HEIGHT and cur_offset[0] < 0 \
+                or lasy < 0.5 * CANVAS_HEIGHT and cur_offset[0] > 0:
+                    cur_offset[0] *= scalar_y
                 new_x = max(0, min(lasx + cur_offset[1], CANVAS_WIDTH))
                 new_y = max(0, min(lasy + cur_offset[0], CANVAS_HEIGHT))
                 canvas.create_line((lasx, lasy, new_x, new_y),

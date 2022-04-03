@@ -36,10 +36,10 @@ def process_gyro(input):
             GYRO_Z.put(cur_z)
         smoothed_y = sum_y / AVG_WINDOW
         smoothed_z = sum_z / AVG_WINDOW
-        if smoothed_y > 0:
-            smoothed_y *= 0.5
-        if smoothed_z > 0:
-            smoothed_z *= 0.85
+        if smoothed_y > 0:      # up-direction fixer scalar
+            smoothed_y *= 0.7
+        if smoothed_z > 0:      # left-direction fixer scalar
+            smoothed_z *= 0.9
         GYRO_Y.get()        # remove the first element from the queues
         GYRO_Z.get()
         if smoothed_y >= GYRO_LO_THRES and smoothed_y <= GYRO_HI_THRES: smoothed_y = 0
@@ -58,7 +58,7 @@ def channel_to_color(channel):
     """
     Given a channel and its value, map to a number between 0 to 255 and return it
     """
-    return int(min(255, 0.5 * abs(channel)))
+    return int(min(245, 0.9 * abs(channel)))
 
 def process_color(input):
     """
@@ -71,7 +71,7 @@ def process_color(input):
     B = channel_to_color(ch_B)
     return R, G, B
 
-
+# Mother function
 def data_stream(gyro_stream, color_stream):
     """
     Take the stream of input data,
@@ -83,3 +83,19 @@ def data_stream(gyro_stream, color_stream):
         gyro.append(process_gyro(gyro_stream[i]))
         color.append(process_color(color_stream[i]))
     return gyro, color
+
+def get_correcting_scalar(CANVAS_WIDTH, CANVAS_HEIGHT, lasx, lasy):
+    """
+    Calculates the movement speed fixing scalars based on canvas dimensions and
+    current location. Makes it easier to move towards the middle when at borders
+    Returns the x-direction scalar and the y-direction scalar
+    """
+    BORDER_SPEED = 2    # the max movement scalar, reached at borders
+    scalar_x = scalar_y = 1
+    ratio_x = lasx / CANVAS_WIDTH
+    ratio_y = lasy / CANVAS_HEIGHT
+    if   ratio_x < 0.3: scalar_x = (1 - BORDER_SPEED) / 0.3 * ratio_x + BORDER_SPEED
+    elif ratio_x > 0.7: scalar_x = (BORDER_SPEED - 1) / 0.3 * ratio_x + BORDER_SPEED - (BORDER_SPEED - 1) / 0.3
+    if   ratio_y < 0.3: scalar_y = (1 - BORDER_SPEED) / 0.3 * ratio_y + BORDER_SPEED
+    elif ratio_y > 0.7: scalar_y = (BORDER_SPEED - 1) / 0.3 * ratio_y + BORDER_SPEED - (BORDER_SPEED - 1) / 0.3
+    return scalar_x, scalar_y
