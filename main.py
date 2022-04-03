@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt  # Module used for plotting
 from muselsl import list_muses, stream
 from pylsl import StreamInlet, resolve_byprop  # Module to receive EEG data
 from scipy.signal import lfilter_zi, lfilter, butter
+from tkinter import *
 
 import data_parser as dp
-import canvas as cv
 
 NOTCH_B, NOTCH_A = butter(4, np.array([55, 65])/(256/2), btype='bandstop')
 
@@ -28,6 +28,11 @@ def update_buffer(data_buffer, new_data, notch=False, filter_state=None):
     new_buffer = new_buffer[new_data.shape[0]:, :]
 
     return new_buffer, filter_state
+
+def _from_rgb(rgb):
+    """translates an rgb tuple of int to a tkinter friendly color code
+    """
+    return "#%02x%02x%02x" % rgb
 
 if __name__ == '__main__':
     """ 1. CONNECT TO EEG STREAM """
@@ -116,10 +121,16 @@ if __name__ == '__main__':
     gyro_buffer = np.zeros((int(fs * buffer_length), n_channels_gyro))
     filter_state = None  # for use with the notch filter
 
+    lasx = 540
+    lasy = 360
+
     try:
         # The following loop does what we see in the diagram of Exercise 1:
         # acquire data, compute features, visualize raw EEG and the features
-        cv.load_canvas()
+        app = Tk()
+        app.geometry("1080x720")
+        canvas = Canvas(app, width=1080, height=720, bg='white')
+        canvas.pack(pady=20)
         while True:
             """ 3.1 ACQUIRE DATA """
             # Obtain EEG data from the LSL stream
@@ -140,7 +151,13 @@ if __name__ == '__main__':
             for idx in range(len(gyros)):
                 cur_offset = gyros[idx]
                 cur_color = colors[idx]
-                cv.draw_line(cur_offset[0], cur_offset[1], cur_color[0], cur_color[1], cur_color[2])
+                canvas.create_line((lasx, lasy, cur_offset[0], cur_offset[1]),
+                      fill=_from_rgb((cur_color[0], cur_color[1], cur_color[2])),
+                      width=2)
+                app.update_idletasks()
+                app.update()
+                lasx += cur_offset[0]
+                lasy += cur_offset[1]
 
             # # Update EEG buffer
             # eeg_buffer, filter_state = update_buffer(
