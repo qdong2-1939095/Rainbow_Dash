@@ -35,13 +35,6 @@ def _from_rgb(rgb):
     """
     return "#%02x%02x%02x" % rgb
 
-def save_as_png(canvas):
-    # save postscipt image
-    canvas.postscript(file = 'temp.eps')
-    # use PIL to convert to PNG
-    img = Image.open('temp.eps')
-    img.save('output.png', 'png')
-
 if __name__ == '__main__':
     """ 1. CONNECT TO EEG STREAM """
 
@@ -196,4 +189,4 @@ if __name__ == '__main__':
 
         print('Closing!')
 
-    save_as_png(canvas)
+    canvas.postscript(file = 'temp.ps')
