@@ -4,6 +4,7 @@ from muselsl import list_muses, stream
 from pylsl import StreamInlet, resolve_byprop  # Module to receive EEG data
 from scipy.signal import lfilter_zi, lfilter, butter
 from tkinter import *
+from PIL import Image
 
 import data_parser as dp
 
@@ -33,6 +34,13 @@ def _from_rgb(rgb):
     """translates an rgb tuple of int to a tkinter friendly color code
     """
     return "#%02x%02x%02x" % rgb
+
+def save_as_png(canvas):
+    # save postscipt image
+    canvas.postscript(file = 'temp.eps')
+    # use PIL to convert to PNG
+    img = Image.open('temp.eps')
+    img.save('output.png', 'png')
 
 if __name__ == '__main__':
     """ 1. CONNECT TO EEG STREAM """
@@ -187,5 +195,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
 
         print('Closing!')
-    
-    canvas.postscript(file="output.ps", colormode='color')
+
+    save_as_png(canvas)
