@@ -121,16 +121,17 @@ if __name__ == '__main__':
     gyro_buffer = np.zeros((int(fs * buffer_length), n_channels_gyro))
     filter_state = None  # for use with the notch filter
 
+    # create a tkinter window and built same-size canvas in it
+    app = Tk()
+    app.geometry("1080x720")
+    canvas = Canvas(app, width=1080, height=720, bg='white')
+    canvas.pack(pady=20)
     lasx = 540
     lasy = 360
 
     try:
         # The following loop does what we see in the diagram of Exercise 1:
         # acquire data, compute features, visualize raw EEG and the features
-        app = Tk()
-        app.geometry("1080x720")
-        canvas = Canvas(app, width=1080, height=720, bg='white')
-        canvas.pack(pady=20)
         while True:
             """ 3.1 ACQUIRE DATA """
             # Obtain EEG data from the LSL stream
